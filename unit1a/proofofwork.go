@@ -21,7 +21,7 @@ type ProofofWork struct {
 }
 
 //新建工作量证明
-func NewProofoWork(b *Block) *ProofofWork {
+func NewProofofWork(b *Block) *ProofofWork {
 
 	//创建一个大整数对象，初始值为1
 	target := big.NewInt(1)
@@ -74,7 +74,6 @@ func (pow *ProofofWork) Run() (int, []byte) {
 			nonce++
 		}
 	}
-	fmt.Println("\n")
 	return nonce, hash[:]
 }
 

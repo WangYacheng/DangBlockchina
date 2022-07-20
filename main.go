@@ -7,7 +7,5 @@ import (
 
 func main() {
 	fmt.Println("Welcome to Dangblockchina")
-
 	unit1a.Show()
-
 }
