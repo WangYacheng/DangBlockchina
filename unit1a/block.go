@@ -48,7 +48,7 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 
 	block.Hash = hash[:]
 	block.Nonce = nonce
-	fmt.Printf("NewBlock.Hash：%x\n", hash[:])
+	fmt.Printf("NewBlock()"+data+"：%x\n", hash[:])
 	return block
 }
 

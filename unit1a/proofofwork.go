@@ -3,7 +3,6 @@ package unit1a
 import (
 	"bytes"
 	"crypto/sha256"
-	"fmt"
 	"math"
 	"math/big"
 )
@@ -63,7 +62,7 @@ func (pow *ProofofWork) Run() (int, []byte) {
 		// 4求Hash值
 		hash = sha256.Sum256(data)
 		// 5打印Hash值
-		fmt.Printf("\r%x", hash)
+		//fmt.Printf("\r%x", hash)
 		// 6 将Hash值设置为一个大整数
 		hashInt.SetBytes(hash[:])
 		// 7 与目标值比较

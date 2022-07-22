@@ -6,7 +6,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// 定义迭代器类型
+//定义迭代器类型
 type BlockchainIterator struct {
 	currentHash []byte
 	db          *bolt.DB
@@ -16,15 +16,16 @@ type BlockchainIterator struct {
 func (i *BlockchainIterator) Next() *Block {
 	var block *Block
 	err := i.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(blockBucket))
-		encodedBlock := b.Get(i.currentHash)
-		block = DeserializeBlock((encodedBlock))
+		b := tx.Bucket([]byte(blockBucket))   //从库中读取 blocks 表
+		encodeBlock := b.Get(i.currentHash)   //从表中读取与哈希值相对应的链数据
+		block = DeserializeBlock(encodeBlock) //将结果反序列化
 		return nil
 	})
 
 	if err != nil {
 		log.Panic(err)
 	}
+
 	i.currentHash = block.PrevBlockHash
 	return block
 }

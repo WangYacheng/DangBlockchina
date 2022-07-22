@@ -1,6 +1,7 @@
 package unit1a
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/boltdb/bolt"
@@ -47,9 +48,12 @@ func NewBlockchain() *Blockchain {
 			//2.4 写入最后一个区块的Hash值
 			err = b.Put([]byte("1"), genesis.Hash)
 			tip = b.Get([]byte("1"))
+
+			fmt.Println("这里是创世区块")
 		} else {
 			//
 			tip = b.Get([]byte("1"))
+			fmt.Println("这里不是创世区块")
 		}
 		//fmt.Println("NewBlockchain")
 		return nil
@@ -69,7 +73,7 @@ func (bc *Blockchain) AddBlock(data string) {
 	// 1 从数据库中读取最后一个区块的Hash值
 	err := bc.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
-		lastHash = b.Get([]byte("l"))
+		lastHash = b.Get([]byte("1"))
 		return nil
 	})
 	if err != nil {
@@ -86,11 +90,14 @@ func (bc *Blockchain) AddBlock(data string) {
 			log.Panic(err)
 		}
 		// 3.2 写入最后一个区块的Hash
-		err = b.Put([]byte("l"), newBlock.Hash)
+		err = b.Put([]byte("1"), newBlock.Hash)
 		if err != nil {
 			log.Panic(err)
 		}
 		bc.tip = newBlock.Hash
+		fmt.Printf("AddBlock()"+data+"：%x\n", bc.tip[:])
+		lastHash := b.Get([]byte("1"))
+		fmt.Printf("lastHash= :%x\n", lastHash[:])
 		return nil
 	})
 }
@@ -100,3 +107,73 @@ func (bc *Blockchain) Iterator() *BlockchainIterator {
 	bci := &BlockchainIterator{bc.tip, bc.db}
 	return bci
 }
+
+// test
+func Test1() {
+	db, err := bolt.Open(dbFile, 0600, nil)
+
+	db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(blockBucket))
+		lastHash := b.Get([]byte("1"))
+		result := b.Get(lastHash[:])
+
+		//result := b.Get([]byte("1"))
+		block := DeserializeBlock(result)
+		fmt.Printf("Data:%s\n", block.Data)
+		fmt.Printf("Hash:%x\n", block.Hash)
+		return nil
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+func Test2() {
+	db, err := bolt.Open(dbFile, 0600, nil)
+	db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(blockBucket))
+		c := bucket.Cursor()
+
+		/*
+			index := 0
+			for {
+				k, v := c.Next()
+				if k == nil || v == nil {
+					return nil
+				}
+				index = index + 1
+				fmt.Println(index)
+			}
+		*/
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			str := string(k)
+			if str == "1" {
+				fmt.Println("这里是1")
+				result := bucket.Get(v)
+				block := DeserializeBlock(result)
+				fmt.Printf("Data:%s\n", block.Data)
+				fmt.Printf("Hash:%x\n", block.Hash)
+
+			} else {
+				fmt.Println("这里是 链")
+				block := DeserializeBlock(v)
+				fmt.Printf("Data:%s\n", block.Data)
+				fmt.Printf("Hash:%x\n", block.Hash)
+
+			}
+			fmt.Println()
+		}
+
+		return nil
+
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+}
+
+func Test3() {}
